@@ -53,36 +53,33 @@ VueSSRServerPlugin.prototype.apply = function apply(compiler) {
     validate(compiler);
 
     onEmit(compiler, 'vue-server-plugin', function(compilation, cb) {
-        var stats = compilation.getStats().toJson();
-        var entryName = Object.keys(stats.entrypoints)[0];
-        var entryInfo = stats.entrypoints[entryName];
-
-        if (!entryInfo) {
-            // #5553
-            return cb()
-        }
-
-        var entryAssets = entryInfo.assets.filter(isJS);
-
-        if (entryAssets.length > 1) {
-            throw new Error(
-                "Server-side bundle should have one single entry file. " +
-                "Avoid using CommonsChunkPlugin in the server config."
-            )
-        }
-
-        var entry = entryAssets[0];
-        if (!entry || typeof entry !== 'string') {
-            throw new Error(
-                ("Entry \"" + entryName + "\" not found. Did you specify the correct entry option?")
-            )
-        }
-
         var bundle = {
-            entry: entry,
+            entry: {},
             files: {},
             maps: {}
         };
+        var stats = compilation.getStats().toJson();
+        Object.keys(stats.entrypoints).forEach(entryName => {
+            var entryInfo = stats.entrypoints[entryName];
+            if (!entryInfo) {
+                // #5553
+                return cb()
+            }
+            var entryAssets = entryInfo.assets.filter(isJS);
+            if (entryAssets.length > 1) {
+                throw new Error(
+                    "Server-side bundle should have one single entry file. " +
+                    "Avoid using CommonsChunkPlugin in the server config."
+                )
+            }
+            var entry = entryAssets[0];
+            if (!entry || typeof entry !== 'string') {
+                throw new Error(
+                    ("Entry \"" + entryName + "\" not found. Did you specify the correct entry option?")
+                )
+            }
+            bundle.entry[entryName] = entry
+        })
 
         stats.assets.forEach(function(asset) {
             if (isJS(asset.name)) {
