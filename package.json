@@ -1,0 +1,25 @@
+{
+    "name": "vue-server-renderer-multi",
+    "version": "2.6.10",
+    "description": "支持多入口配置的vue服务端渲染插件",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/LaoLeo/vue-server-renderer-multi.git"
+    },
+    "keywords": [
+        "vue",
+        "vue-server-renderer",
+        "ssr",
+        "multi-entry"
+    ],
+    "author": "Alex Lao,Evan You",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/LaoLeo/vue-server-renderer-multi/issues"
+    },
+    "homepage": "https://github.com/LaoLeo/vue-server-renderer-multi#readme"
+}
