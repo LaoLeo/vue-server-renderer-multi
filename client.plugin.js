@@ -41,18 +41,25 @@ VueSSRClientPlugin.prototype.apply = function apply(compiler) {
     onEmit(compiler, 'vue-client-plugin', function(compilation, cb) {
         var stats = compilation.getStats().toJson();
 
-        console.warn(stats)
         var allFiles = uniq(stats.assets
             .map(function(a) { return a.name; }));
 
-        var initialFiles = uniq(Object.keys(stats.entrypoints)
-            .map(function(name) { return stats.entrypoints[name].assets; })
-            .reduce(function(assets, all) { return all.concat(assets); }, [])
-            .filter(function(file) { return isJS(file) || isCSS(file); }));
+        var initialFiles = Object.keys(stats.entrypoints)
+            .reduce(function(data, name) {
+                data[name] = uniq(stats.entrypoints[name].assets
+                    .filter(function(file) { return isJS(file) || isCSS(file) }))
+                return data
+            }, {})
+
+        var initialAllFiles = Object.keys(initialFiles)
+            .reduce(function(assets, name) {
+                return initialFiles[name].concat(assets)
+            }, [])
+
 
         var asyncFiles = allFiles
             .filter(function(file) { return isJS(file) || isCSS(file); })
-            .filter(function(file) { return initialFiles.indexOf(file) < 0; });
+            .filter(function(file) { return initialAllFiles.indexOf(file) < 0; });
 
         var manifest = {
             publicPath: stats.publicPath,
